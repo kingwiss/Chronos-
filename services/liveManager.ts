@@ -3,8 +3,17 @@ import { GoogleGenAI, LiveServerMessage, Modality, Type, FunctionDeclaration } f
 import { AudioStreamPlayer, float32ToInt16PCM, arrayBufferToBase64 } from "../utils/audioUtils";
 import { NoteType } from "../types";
 
-// Removed global initialization
-// const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// --- CONFIGURATION ---
+// REPLACE THIS WITH YOUR GEMINI API KEY
+const GEMINI_API_KEY = "REPLACE_WITH_YOUR_GEMINI_API_KEY";
+
+const getAiClient = () => {
+    if (GEMINI_API_KEY.includes("REPLACE_WITH")) {
+        console.error("Gemini API Key is missing. Please update services/liveManager.ts");
+        throw new Error("Gemini API Key missing");
+    }
+    return new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+};
 
 // Define the function for the AI to update notes - EXPANDED FOR TOTAL CONTROL
 const updateNoteTool: FunctionDeclaration = {
@@ -182,7 +191,7 @@ You have full control over the user's notes. You can morph any note into anythin
         systemInstruction += `\n=== CURRENT FOCUS ===\n${context}\nIMPORTANT: The user is looking at or discussing THIS specific note. Apply changes to it directly using 'updateNote'.`;
       }
 
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = getAiClient();
 
       const config = {
         model,

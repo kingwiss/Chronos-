@@ -2,8 +2,17 @@
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { AIResponse, Note } from "../types";
 
-// Removed global initialization to prevent reading process.env.API_KEY too early
-// const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// --- CONFIGURATION ---
+// REPLACE THIS WITH YOUR GEMINI API KEY from https://aistudio.google.com/app/apikey
+const GEMINI_API_KEY = "REPLACE_WITH_YOUR_GEMINI_API_KEY";
+
+const getAiClient = () => {
+    if (GEMINI_API_KEY.includes("REPLACE_WITH")) {
+        console.error("Gemini API Key is missing. Please update services/geminiService.ts");
+        throw new Error("Gemini API Key missing");
+    }
+    return new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+};
 
 // Get detailed user context to ensure the AI understands "Local Time"
 const getUserContext = () => {
@@ -72,7 +81,7 @@ const formatHistoryForPrompt = (notes: Note[]) => {
 };
 
 export async function processAudioNote(base64Audio: string, mimeType: string, existingNotes: Note[]): Promise<AIResponse> {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAiClient();
   // Use gemini-2.0-flash-exp for reliable multimodal processing
   const model = 'gemini-2.0-flash-exp';
   const history = formatHistoryForPrompt(existingNotes);
@@ -111,7 +120,7 @@ export async function processAudioNote(base64Audio: string, mimeType: string, ex
 }
 
 export async function formatTextNote(rawText: string, existingNotes: Note[]): Promise<AIResponse> {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAiClient();
   // Use gemini-2.0-flash-exp for text processing
   const model = 'gemini-2.0-flash-exp';
   const history = formatHistoryForPrompt(existingNotes);
@@ -138,7 +147,7 @@ export async function formatTextNote(rawText: string, existingNotes: Note[]): Pr
 }
 
 export async function transcribeAudio(base64Audio: string, mimeType: string): Promise<string> {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAiClient();
   // Use gemini-2.0-flash-exp for transcription
   const model = 'gemini-2.0-flash-exp';
   try {
@@ -159,7 +168,7 @@ export async function transcribeAudio(base64Audio: string, mimeType: string): Pr
 }
 
 export async function analyzeImageNote(base64Image: string, mimeType: string, userText: string, existingNotes: Note[]): Promise<AIResponse> {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAiClient();
   // Use gemini-2.0-flash-exp for image analysis
   const model = 'gemini-2.0-flash-exp';
   
@@ -215,7 +224,7 @@ export async function analyzeImageNote(base64Image: string, mimeType: string, us
  * Generates a fun cartoon illustration based on a prompt.
  */
 export async function generateIllustration(prompt: string): Promise<string | null> {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAiClient();
   // Use gemini-2.5-flash-image for generation
   const model = 'gemini-2.5-flash-image';
   const fullPrompt = `A fun, vibrant, clean cartoon illustration of: ${prompt}. Minimalist style, suitable for a mobile app timeline.`;
@@ -246,7 +255,7 @@ export async function generateIllustration(prompt: string): Promise<string | nul
  * Generates speech from text.
  */
 export async function streamSpeech(text: string) {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAiClient();
   const model = "gemini-2.5-flash-preview-tts";
   try {
     const response = await ai.models.generateContent({
