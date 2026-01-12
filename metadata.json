@@ -1,0 +1,8 @@
+{
+  "name": "Chronos Notepad",
+  "description": "A timeline-driven personal knowledge base that seamlessly organizes notes and voice recordings by date and time using AI transcription and intelligent formatting.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}
